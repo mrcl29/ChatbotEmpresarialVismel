@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_SCHEMA: ${DB_SCHEMA}
+      DB_BOT_PASSWORD: ${DB_BOT_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - "pg_data:/var/lib/postgresql/data"
+      - "./db/postgres-init:/docker-entrypoint-initdb.d"
+
+  redis:
+    build:
+      context: .
+      dockerfile: ./db/redis/Dockerfile
+    container_name: redis
+    restart: always
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - ./db/redis/redis.template.conf:/etc/redis.template.conf
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "envsubst < /etc/redis.template.conf > /etc/redis.conf &&
+      redis-server /etc/redis.conf"
+
+  backend_python:
+    build:
+      context: ./backend/python
+    container_name: backend_python
+    restart: always
+    ports:
+      - "${VITE_BACKEND_PYTHON_PORT}:${VITE_BACKEND_PYTHON_PORT}"
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - PORT=${VITE_BACKEND_PYTHON_PORT}
+    env_file:
+      - ./backend/python/.env
+      - ./.env
+
+  backend_node:
+    build:
+      context: ./backend/node
+    container_name: backend_node
+    restart: always
+    ports:
+      - "${VITE_BACKEND_NODE_PORT}:${VITE_BACKEND_NODE_PORT}"
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - FRONTEND_HOST=frontend
+      - BOT_HOST=backend_python
+      - PORT=${VITE_BACKEND_NODE_PORT}
+    env_file:
+      - ./backend/node/.env
+      - ./.env
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "${VITE_FRONTEND_PORT}:${VITE_FRONTEND_PORT}"
+    env_file:
+      - .env
+    environment:
+      - VITE_BACKEND_NODE_HOST=backend_node
+      - PORT=${VITE_FRONTEND_PORT}
+
+volumes:
+  pg_data:

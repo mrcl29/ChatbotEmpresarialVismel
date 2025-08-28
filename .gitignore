@@ -1,0 +1,30 @@
+# Entornos virtuales
+venv/
+.venv/
+
+# Node.js
+node_modules/
+
+# VSCode config
+.vscode/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de entorno en cualquier carpeta
+**/.env
+
+# Logs
+logs/
+*.log
+*.logs
+
+# Ignorar todo en documents/Memoria/out_dir/
+documents/Memoria/out_dir/**
+
+# Pero no ignores los archivos .pdf
+!documents/Memoria/out_dir/**/*.pdf
+
+!documents/Memoria/**/*.tex
