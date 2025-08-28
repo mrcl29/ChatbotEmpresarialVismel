@@ -16,8 +16,7 @@ Through an optimized conversational flow and dynamically generated personalized 
 - [Características / Features](#-características--features)  
 - [Instalación / Installation](#-instalación--installation)  
 - [Uso / Usage](#-uso--usage)  
-- [Tecnologías / Built-with](#-tecnologías--built-with)  
-- [Contribuciones / Contributing](#-contribuciones--contributing)  
+- [Tecnologías / Built-with](#-tecnologías--built-with)
 - [Licencia / License](#-licencia--license)  
 
 ---
